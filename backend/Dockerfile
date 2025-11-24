@@ -16,12 +16,13 @@ COPY backend/package*.json ./
 RUN npm install
 
 # Copy rest of backend source code
-COPY backend/. .
+COPY . .
 
 # Expose backend port
 EXPOSE 3000
 
 # Start backend server
 CMD ["node", "index.js"]
+
 
 
