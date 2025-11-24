@@ -7,7 +7,7 @@ RUN apk add --no-cache python3 py3-pip ffmpeg
 RUN pip3 install yt-dlp
 
 # Set working directory
-WORKDIR /app
+WORKDIR /
 
 # Copy package.json and package-lock.json
 COPY backend/package*.json ./
@@ -23,4 +23,5 @@ EXPOSE 3000
 
 # Start backend server
 CMD ["node", "index.js"]
+
 
