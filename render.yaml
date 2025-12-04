@@ -1,9 +1,36 @@
 services:
+  # Backend API Service
   - type: web
-    name: multisteam
+    name: multistream-backend
     env: node
-    repo: https://github.com/ksrstudio355-lgtm/multisteam.git
-    branch: main
-    buildCommand: npm install
-    startCommand: npm start
-    autoDeploy: true
+    dockerfilePath: ./backend/Dockerfile
+    plan: starter
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+    healthCheckPath: /health
+
+  # Frontend Service  
+  - type: web
+    name: multistream-frontend
+    env: docker
+    dockerfilePath: ./Dockerfile.nginx
+    plan: starter
+    envVars:
+      - key: BACKEND_URL
+        fromService:
+          name: multistream-backend
+          property: url  # Render internal URL
+      - key: NGINX_BACKEND_HOST
+        fromService:
+          name: multistream-backend
+          envVar: RENDER_EXTERNAL_HOSTNAME  # For nginx config
+
+  # RTMP Server
+  - type: web
+    name: multistream-rtmp
+    env: docker
+    dockerfilePath: ./Dockerfile.rtmp
+    plan: starter
