@@ -1,9 +1,9 @@
 services:
   # Backend API (Node.js)
   - type: web
-    name: multistream-backend
+    name:backend
     env: node
-    repo: https://github.com/yourusername/multistream-app
+    repo: https://github.com/Rahul-RShankar/Ostream--broadcasting
     rootDir: backend
     plan: free
     buildCommand: npm install
