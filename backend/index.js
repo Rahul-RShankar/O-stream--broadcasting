@@ -41,15 +41,20 @@ app.post('/extract-stream', (req, res) => {
   if (!url) {
     return res.status(200).json({ success: false, message: 'URL required' });
   }
-
+  
   console.log('Extracting stream for:', url); // Add logging
-const ytDlpArgs = url.includes('youtube.com') || url.includes('youtu.be') 
-    ? `yt-dlp --extractor-args "youtube:player_client=web" -g -f "best[height<=720]" "${url}"`
-  // Create child process with timeout
-  const child = exec(`yt-dlp -g -f "best[height<=720]" "${url}"`, { 
-    timeout: 25000, // 25 second timeout
-    maxBuffer: 1024 * 1024 // 1MB buffer
-  }, (error, stdout, stderr) => {
+
+ // FIXED YouTube workaround
+  const isYouTube = url.includes('youtube.com') || url.includes('youtu.be');
+  const ytDlpArgs = isYouTube 
+    ? `yt-dlp --extractor-args "youtube:player_client=web,default" --no-warnings -g -f "best[height<=720]" "${url}"`
+    : `yt-dlp -g -f "best[height<=720]" "${url}"`;
+ // Create child process with timeout
+  const child = exec(ytDlpArgs, { 
+    timeout: 30000,
+    maxBuffer: 2 * 1024 * 1024 
+  }, (error, stdout, stderr) =>
+  {
     console.log('yt-dlp finished:', { error: !!error, stdout: stdout?.length, stderr: stderr?.length });
     
     if (error) {
