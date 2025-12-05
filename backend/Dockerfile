@@ -24,7 +24,13 @@ COPY backend/ ./backend/
 # COPY nginx-frontend.conf /etc/nginx/conf.d/default.conf
 
 # Copy frontend static files to nginx
-COPY frontend/ /usr/share/nginx/html/
+#COPY frontend/ /usr/share/nginx/html/
+
+COPY frontend/ ./public/
+# RUN mkdir -p /recordings
+
+# EXPOSE 10000
+
 
 # Create nginx directories
 RUN mkdir -p /var/run/nginx /var/log/nginx /usr/share/nginx/html
@@ -37,6 +43,7 @@ EXPOSE 80 1935
 
 # Start nginx + Node.js
 CMD sh -c "nginx -g 'daemon off;' & cd /app && node backend/index.js & wait"
+
 
 
 
