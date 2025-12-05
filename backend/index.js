@@ -10,12 +10,13 @@ const path = require('path');
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
-
-//app.use(express.static('public'));
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
+app.use(express.static('public'));
+app.listen(process.env.PORT || 80, () => {
+  console.log('Server running on port', process.env.PORT || 80);
+});
 // Store active streams
 const activeStreams = new Map();
 
