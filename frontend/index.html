@@ -208,9 +208,14 @@
 <small>Optional: Upload YouTube cookies.txt to bypass bot detection</small>
 
 <script>
-async function extractStream() {
+
+  async function extractStream() {
   const url = document.getElementById('sourceInput').value;
-  const cookiesFile = document.getElementById('cookiesFile').files[0];
+  if (!url) {
+    showAlert('Please enter a URL', 'error');
+    return;
+  }
+     const cookiesFile = document.getElementById('cookiesFile').files[0];
   
   const data = { url };
   
@@ -219,19 +224,33 @@ async function extractStream() {
     const cookies = await cookiesFile.text();
     data.cookies = cookies;
   }
-  
   try {
     const response = await fetch('/extract-stream', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
+      body: JSON.stringify({ data })
     });
-    const result = await response.json();
-    console.log('Extraction result:', result);
+
+    if (response.ok) {
+      const data = await response.json();  // ← PARSE RESPONSE!
+      
+      if (data.success) {
+        // ✅ STORE extracted stream URL
+        document.getElementById('sourceInput').value = data.stream_url;
+        showAlert(`✅ Stream extracted! Ready for streaming.`, 'success');
+      } else {
+        showAlert(`❌ Extraction failed: ${data.message}`, 'error');
+      }
+    } else {
+      showAlert('❌ Failed to extract stream', 'error');
+    }
   } catch (error) {
-    console.error('Extraction failed:', error);
+    showAlert(`Error: ${error.message}`, 'error');
   }
 }
+    
+
+    
 </script>
 
                 <button onclick="extractStream()">🔍 Extract Stream</button>
@@ -350,39 +369,6 @@ async function extractStream() {
             container.appendChild(alert);
             setTimeout(() => alert.remove(), 5000);
         }
-
-        async function extractStream() {
-  const url = document.getElementById('sourceInput').value;
-  if (!url) {
-    showAlert('Please enter a URL', 'error');
-    return;
-  }
-
-  try {
-    const response = await fetch('/extract-stream', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url })
-    });
-
-    if (response.ok) {
-      const data = await response.json();  // ← PARSE RESPONSE!
-      
-      if (data.success) {
-        // ✅ STORE extracted stream URL
-        document.getElementById('sourceInput').value = data.stream_url;
-        showAlert(`✅ Stream extracted! Ready for streaming.`, 'success');
-      } else {
-        showAlert(`❌ Extraction failed: ${data.message}`, 'error');
-      }
-    } else {
-      showAlert('❌ Failed to extract stream', 'error');
-    }
-  } catch (error) {
-    showAlert(`Error: ${error.message}`, 'error');
-  }
-}
-
 
         function addDestination() {
             const platform = document.getElementById('platformSelect').value;
