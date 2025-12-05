@@ -203,6 +203,36 @@
 
                 <label id="sourceLabel">Video URL:</label>
                 <textarea id="sourceInput" placeholder="https://www.youtube.com/watch?v=..." rows="2" required></textarea>
+                 <!-- Add this to your form -->
+<input type="file" id="cookiesFile" accept=".txt" style="margin: 10px 0;">
+<small>Optional: Upload YouTube cookies.txt to bypass bot detection</small>
+
+<script>
+async function extractStream() {
+  const url = document.getElementById('urlInput').value;
+  const cookiesFile = document.getElementById('cookiesFile').files[0];
+  
+  const data = { url };
+  
+  // Add cookies if uploaded
+  if (cookiesFile) {
+    const cookies = await cookiesFile.text();
+    data.cookies = cookies;
+  }
+  
+  try {
+    const response = await fetch('/extract-stream', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    const result = await response.json();
+    console.log('Extraction result:', result);
+  } catch (error) {
+    console.error('Extraction failed:', error);
+  }
+}
+</script>
 
                 <button onclick="extractStream()">🔍 Extract Stream</button>
 
